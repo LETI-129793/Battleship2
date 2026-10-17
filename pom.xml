@@ -133,6 +133,14 @@
 			<version>${jetbrains.annotations.version}</version>
 			<scope>compile</scope>
 		</dependency>
+
+		<!-- H2 Database (Armazenamento das jogadas) -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.3.232</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
