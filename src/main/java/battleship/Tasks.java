@@ -1,5 +1,7 @@
 package battleship;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,6 +34,12 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String HISTORICO = "historico";
+
+	/**
+	 * Repositório onde as jogadas são armazenadas (null se a base de dados não estiver disponível)
+	 */
+	private static MoveRepository repository;
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -40,6 +48,7 @@ public class Tasks {
 
 		IFleet myFleet = null;
 		IGame game = null;
+		repository = openRepository();
 		menuHelp();
 
 		System.out.print("> ");
@@ -50,13 +59,16 @@ public class Tasks {
 			switch (command) {
 				case GERAFROTA:
 					myFleet = Fleet.createRandom();
-					game = new Game(myFleet);
+					game = newGame(myFleet);
 					game.printMyBoard(false, true);
 					break;
 				case LEFROTA:
 					myFleet = buildFleet(in);
-					game = new Game(myFleet);
+					game = newGame(myFleet);
 					game.printMyBoard(false, true);
+					break;
+				case HISTORICO:
+					printHistory(game);
 					break;
 				case STATUS:
 					if (myFleet != null)
@@ -74,6 +86,7 @@ public class Tasks {
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+							closeRepository();
 							System.exit(0);
 						}
 					}
@@ -93,6 +106,7 @@ public class Tasks {
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+							closeRepository();
 							System.exit(0);
 						}
 					}
@@ -101,16 +115,77 @@ public class Tasks {
 					if (game != null)
 						game.printMyBoard(true, true);
 					break;
-                case AJUDA:
-                    menuHelp();
-                    break;
+				case AJUDA:
+					menuHelp();
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
 			System.out.print("> ");
 			command = in.next();
 		}
+		closeRepository();
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	/**
+	 * Abre a base de dados das jogadas. Se não for possível, o jogo continua sem armazenamento.
+	 *
+	 * @return o repositório aberto, ou null em caso de erro
+	 */
+	private static MoveRepository openRepository() {
+		try {
+			return new MoveRepository(MoveRepository.DEFAULT_URL);
+		} catch (SQLException e) {
+			LOGGER.warn("Base de dados indisponível, as jogadas não serão guardadas: {}", e.getMessage());
+			return null;
+		}
+	}
+
+	private static void closeRepository() {
+		if (repository != null) {
+			repository.close();
+			repository = null;
+		}
+	}
+
+	/**
+	 * Cria um novo jogo, guardando as jogadas na base de dados quando esta estiver disponível.
+	 *
+	 * @param fleet a frota do jogo
+	 * @return o novo jogo
+	 */
+	private static IGame newGame(IFleet fleet) {
+		if (repository != null) {
+			try {
+				Game game = new Game(fleet, repository);
+				LOGGER.info("Jogo nº{} registado na base de dados", game.getGameId());
+				return game;
+			} catch (SQLException e) {
+				LOGGER.warn("Não foi possível registar o jogo na base de dados: {}", e.getMessage());
+			}
+		}
+		return new Game(fleet);
+	}
+
+	/**
+	 * Mostra as jogadas do jogo atual guardadas na base de dados.
+	 *
+	 * @param game o jogo atual
+	 */
+	private static void printHistory(IGame game) {
+		if (repository == null || !(game instanceof Game g) || g.getGameId() == 0) {
+			System.out.println("Não há jogadas guardadas na base de dados para este jogo.");
+			return;
+		}
+		try {
+			List<MoveRepository.StoredMove> moves = repository.findMovesByGame(g.getGameId());
+			System.out.println("Jogadas guardadas do jogo nº" + g.getGameId() + ": " + moves.size());
+			for (MoveRepository.StoredMove move : moves)
+				System.out.println(move);
+		} catch (SQLException e) {
+			LOGGER.error("Erro ao ler o histórico de jogadas", e);
+		}
 	}
 
 	/**
@@ -125,6 +200,7 @@ public class Tasks {
 		System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
 		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
+		System.out.println("- " + HISTORICO + ": Mostra as jogadas do jogo atual guardadas na base de dados.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
 		System.out.println("===============================================================");
