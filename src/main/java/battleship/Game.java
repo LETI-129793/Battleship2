@@ -168,7 +168,7 @@ public class Game implements IGame
 	private Integer countHits;
 	private Integer countSinks;
 	private int moveNumber;
-
+	private final List<String> gameHistory = new ArrayList<>();
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
 	{
@@ -353,6 +353,7 @@ public class Game implements IGame
 		move.processEnemyFire(true);
 
 		alienMoves.add(move);
+		gameHistory.add("Jogada " + moveNumber + ": Rajada em " + shots);
 
 		moveNumber++;
 	}
@@ -451,5 +452,12 @@ public class Game implements IGame
 			System.out.println("+--------------------------------------------------------------+");
 			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
 			System.out.println("+--------------------------------------------------------------+");
+	}
+	public void exportGameToPDF() {
+		if (gameHistory.isEmpty()) {
+			System.out.println("Ainda nao existem jogadas registadas nesta partida.");
+			return;
+		}
+		PDFExporter.exportMovesToPDF(gameHistory, "jogadas_partida.pdf");
 	}
 }
