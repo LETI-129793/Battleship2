@@ -25,17 +25,16 @@ public class PDFExporter {
                 content.showText("Relatorio de Jogadas - Batalha Naval");
                 content.newLineAtOffset(0, -30);
 
-                // Imprimir cada jogada real efetuada
+                // Imprimir cada jogada
                 content.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 11);
                 int count = 0;
                 for (String move : moves) {
-                    // Limpa caracteres especiais para evitar erros no PDF
                     String line = move.replaceAll("[^\\x00-\\x7F]", "");
                     content.showText("- " + line);
                     content.newLineAtOffset(0, -16);
 
                     count++;
-                    if (count >= 38) break; // Limite por pagina
+                    if (count >= 38) break;
                 }
                 content.endText();
             }

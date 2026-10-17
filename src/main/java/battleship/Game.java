@@ -4,7 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import java.sql.SQLException;
 import java.util.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Game implements IGame
 {
@@ -168,10 +172,35 @@ public class Game implements IGame
 	private Integer countHits;
 	private Integer countSinks;
 	private int moveNumber;
-	private final List<String> gameHistory = new ArrayList<>();
+
+	private static final Logger LOGGER = LogManager.getLogger();
+
+	private final MoveRepository repository;
+	private final long gameId;
+
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
 	{
+		this(myFleet, null, 0);
+	}
+
+	/**
+	 * Cria um jogo cujas jogadas são guardadas no repositório indicado.
+	 *
+	 * @param myFleet    a frota do jogo
+	 * @param repository o repositório onde as jogadas são armazenadas
+	 * @throws SQLException se não for possível registar o jogo na base de dados
+	 */
+	public Game(IFleet myFleet, MoveRepository repository) throws SQLException
+	{
+		this(myFleet, repository, repository.startGame());
+	}
+
+	private Game(IFleet myFleet, MoveRepository repository, long gameId)
+	{
+		this.repository = repository;
+		this.gameId = gameId;
+
 		this.moveNumber = 1;
 
 		this.alienMoves = new ArrayList<IMove>();
@@ -184,6 +213,14 @@ public class Game implements IGame
 		this.countRepeatedShots = 0;
 		this.countHits = 0;
 		this.countSinks = 0;
+	}
+
+	/**
+	 * @return o identificador do jogo na base de dados, ou 0 se o jogo não estiver a ser guardado
+	 */
+	public long getGameId()
+	{
+		return gameId;
 	}
 
 	@Override
@@ -353,7 +390,14 @@ public class Game implements IGame
 		move.processEnemyFire(true);
 
 		alienMoves.add(move);
-		gameHistory.add("Jogada " + moveNumber + ": Rajada em " + shots);
+
+		if (repository != null) {
+			try {
+				repository.saveMove(gameId, move);
+			} catch (SQLException e) {
+				LOGGER.warn("Não foi possível guardar a jogada nº{} na base de dados: {}", moveNumber, e.getMessage());
+			}
+		}
 
 		moveNumber++;
 	}
@@ -448,16 +492,9 @@ public class Game implements IGame
 	}
 
 	public void over() {
-			System.out.println();
-			System.out.println("+--------------------------------------------------------------+");
-			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
-			System.out.println("+--------------------------------------------------------------+");
-	}
-	public void exportGameToPDF() {
-		if (gameHistory.isEmpty()) {
-			System.out.println("Ainda nao existem jogadas registadas nesta partida.");
-			return;
-		}
-		PDFExporter.exportMovesToPDF(gameHistory, "jogadas_partida.pdf");
+		System.out.println();
+		System.out.println("+--------------------------------------------------------------+");
+		System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
+		System.out.println("+--------------------------------------------------------------+");
 	}
 }
