@@ -35,6 +35,8 @@ public class Tasks {
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
 	private static final String HISTORICO = "historico";
+	private static final String PDF = "pdf";
+
 
 	/**
 	 * Repositório onde as jogadas são armazenadas (null se a base de dados não estiver disponível)
@@ -89,6 +91,18 @@ public class Tasks {
 							closeRepository();
 							System.exit(0);
 						}
+					}
+					break;
+				case "pdf":
+					if (game != null) {
+						// Converter as jogadas do jogo para uma lista de texto
+						List<String> movesAsText = game.getAlienMoves().stream()
+								.map(Object::toString)
+								.toList();
+
+						PDFExporter.exportMovesToPDF(movesAsText, "jogadas_partida.pdf");
+					} else {
+						System.out.println("Inicie um jogo primeiro!");
 					}
 					break;
 				case SIMULA:
@@ -203,6 +217,7 @@ public class Tasks {
 		System.out.println("- " + HISTORICO + ": Mostra as jogadas do jogo atual guardadas na base de dados.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
+		System.out.println("- " + PDF + ":Gera um relatorio das jogadas da partida em formato PDF.");
 		System.out.println("===============================================================");
 	}
 	/**
