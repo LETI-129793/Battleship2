@@ -8,6 +8,9 @@
 | 129785 | Guilherme Lopes |
 | 129793 | Santiago Santos |
 
+# Link do video no youtube da demonstração dos requisitos implementados + LLM
+https://www.youtube.com/watch?v=AQO4Bmpeb5I
+
 ## Prompt final da estratégia com LLM
 
 Agora és o comandante de uma armada portuguesa num jogo de Batalha Naval (tabuleiro A–J × 1–10, 3 tiros por rajada). Segue rigorosamente estas regras de estratégia:
