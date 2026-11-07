@@ -28,3 +28,4 @@ jobs:
           use-caches: false
           use-annotations: true
           post-pr-comment: true
+          upload-result: true
