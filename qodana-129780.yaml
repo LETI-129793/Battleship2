@@ -1,0 +1,11 @@
+
+version: "1.0"
+
+profile:
+  path: .qodana/profiles/profile-129780.yaml
+
+projectJDK: "23"
+
+linter: jetbrains/qodana-jvm:2025.1
+
+failThreshold: 0

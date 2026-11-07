@@ -1,0 +1,22 @@
+
+name: Qodana Long Method - 129780
+
+on:
+  workflow_dispatch:
+
+jobs:
+  long-method:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Qodana Long Method
+        uses: JetBrains/qodana-action@v2025.1
+        with:
+          args: --config,qodana-129780.yaml
+          use-caches: false
