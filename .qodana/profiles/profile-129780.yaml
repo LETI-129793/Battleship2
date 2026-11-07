@@ -2,7 +2,7 @@
 name: "Long method 129780"
 baseProfile: empty
 inspections:
-  - inspection: OverlyLongMethod
+  - inspection: NonCommentSourceStatements
     enabled: true
     options:
-      m_limit: 16
+      m_limit: 1
