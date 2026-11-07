@@ -1,24 +1,30 @@
-
-name: Qodana Long Method - 129780
+# 129780 - O Teu Nome
+name: Qodana smell gate 129780
 
 on:
+  pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
-  long-method:
+  qodana:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
 
-      - name: Run Qodana Long Method
-        uses: JetBrains/qodana-action@v2025.1
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+      - name: Qodana Long Method
+        uses: JetBrains/qodana-action@v2026.2
         with:
           args: --config,qodana-129780.yaml,--disable-sanity
           use-caches: false
+          use-annotations: true
+          post-pr-comment: true

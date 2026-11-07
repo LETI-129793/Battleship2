@@ -1,9 +1,9 @@
-
+# 129780 - O Teu Nome
 profile:
   base:
     name: empty
   inspections:
-    - inspection: NonCommentSourceStatements
+    - inspection: OverlyLongMethod
       enabled: true
       options:
-        m_limit: 30
+        m_limit: 16
