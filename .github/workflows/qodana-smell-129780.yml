@@ -17,6 +17,8 @@ jobs:
 
       - name: Run Qodana Long Method
         uses: JetBrains/qodana-action@v2025.1
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
           args: --config,qodana-129780.yaml
           use-caches: false
