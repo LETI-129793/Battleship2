@@ -20,5 +20,5 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
-          args: --config,qodana-129780.yaml,--profile-path,.qodana/profiles/profile-129780.yaml,--disable-sanity
+          args: --config,qodana-129780.yaml,--disable-sanity
           use-caches: false
