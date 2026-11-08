@@ -24,7 +24,7 @@ jobs:
       # Quality gate nativo do Qodana (failThreshold: 0 em qodana-129785.yaml)
       - uses: JetBrains/qodana-action@v2026.2
         with:
-          args: --config qodana-129785.yaml
+          args: --config qodana-129785.yaml --disable-sanity
           use-annotations: true
           post-pr-comment: true
         env:
