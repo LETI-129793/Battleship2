@@ -6,10 +6,10 @@ package battleship;
 public class Pontuacao {
 
 	public int calcularPontos(IFleet fleet) {
-		int total_pontos = 0;
+		int totalPontos = 0;
 		for (IShip ship : fleet.getSunkShips()) {
-			total_pontos += ship.getSize() * 10;
+			totalPontos += ship.getSize() * 10;
 		}
-		return total_pontos;
+		return totalPontos;
 	}
 }
