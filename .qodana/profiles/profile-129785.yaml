@@ -1,35 +1,25 @@
-# Perfil Qodana - "Large Class" (Fowler) via estratégia "God Class" (Lanza & Marinescu)
+# 129785 - Perfil Qodana "Large Class" (Fowler) via estratégia "God Class" (Lanza & Marinescu)
 #
 # Estratégia do livro:  (ATFD > FEW)  AND  (WMC >= VERY_HIGH)  AND  (TCC < ONE_THIRD)
 #   FEW = 5, VERY_HIGH (WMC, Java) = 47, ONE_THIRD = 1/3
 #
 # As inspeções reportam quando o valor é ESTRITAMENTE SUPERIOR a m_limit.
-version: "1.0"
+name: "Large class 129785"
+baseProfile: empty
+inspections:
+  # WMC >= 47  ->  soma da complexidade ciclomática dos métodos e inicializadores da classe > 46
+  - inspection: ClassComplexity
+    enabled: true
+    options:
+      m_limit: 46
 
-profile:
-  base:
-    name: empty
+  # Proxy de ATFD > 5  ->  nº de classes do projeto referenciadas pela classe > 5
+  # (exclui classes java.* e de bibliotecas: os "dados estrangeiros" do livro são do próprio sistema)
+  - inspection: ClassCoupling
+    enabled: true
+    options:
+      m_limit: 5
+      m_includeJavaClasses: false
+      m_includeLibraryClasses: false
 
-  inspections:
-    # WMC >= 47  ->  soma da complexidade ciclomática dos métodos e inicializadores da classe > 46
-    - inspection: ClassComplexity
-      enabled: true
-      severity: WARNING
-      options:
-        m_limit: 46
-      ignore:
-        - "src/test/**"
-
-    # Proxy de ATFD > 5  ->  nº de classes do projeto referenciadas pela classe > 5
-    # (exclui classes java.* e de bibliotecas: os "dados estrangeiros" do livro são do próprio sistema)
-    - inspection: ClassCoupling
-      enabled: true
-      severity: WARNING
-      options:
-        m_limit: 5
-        m_includeJavaClasses: false
-        m_includeLibraryClasses: false
-      ignore:
-        - "src/test/**"
-
-    # TCC < 1/3: não existe inspeção de coesão no Qodana for JVM (ver qodana-smell-129785.yml)
+  # TCC < 1/3: não existe inspeção de coesão no Qodana for JVM
