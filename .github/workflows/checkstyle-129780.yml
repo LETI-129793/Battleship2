@@ -1,0 +1,28 @@
+# 129780 - Santiago Silva
+name: Checkstyle Naming Gate 129780
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checkstyle-129780:
+    name: Checkstyle 129780
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Run Checkstyle MethodName
+        run: |
+          mvn -B org.apache.maven.plugins:maven-checkstyle-plugin:3.6.0:check \
+            -Dcheckstyle.config.location=checkstyle-129780.xml \
+            -Dcheckstyle.includes=**/*.java \
+            -Dcheckstyle.failOnViolation=true

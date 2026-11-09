@@ -1,0 +1,30 @@
+# 129785 - Guilherme Lopes
+name: Checkstyle Naming Gate 129785
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  checkstyle-129785:
+    name: Checkstyle 129785
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Checkstyle LocalVariableName
+        uses: dbelyaev/action-checkstyle@v4.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-129785.xml
+          checkstyle_version: "14.4.0"
+          reporter: github-pr-check
+          level: error
+          fail_level: error

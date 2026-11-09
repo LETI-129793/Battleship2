@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- 129785 - Guilherme Lopes -->
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <property name="severity" value="error"/>
+
+    <module name="TreeWalker">
+        <!-- Variáveis locais (incluindo parâmetros de catch) em lowerCamelCase, sem underscores -->
+        <module name="LocalVariableName">
+            <property name="format"
+                      value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+    </module>
+</module>

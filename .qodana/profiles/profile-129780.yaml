@@ -1,0 +1,8 @@
+# 129780 - Santiago Silva
+name: "Long method 129780"
+baseProfile: empty
+inspections:
+  - inspection: NonCommentSourceStatements
+    enabled: true
+    options:
+      m_limit: 13
