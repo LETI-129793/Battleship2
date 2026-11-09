@@ -1,0 +1,27 @@
+
+# 129793 - Santiago Santos
+name: Checkstyle ConstantName 129793
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  checkstyle-129793:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Executar Checkstyle
+        uses: dbelyaev/action-checkstyle@v1.12.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-129793.xml
+          level: error
+          fail_level: error
