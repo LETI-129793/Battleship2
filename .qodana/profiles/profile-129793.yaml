@@ -1,8 +1,8 @@
-profile:
-  base:
-    name: empty
-  inspections:
-    - inspection: ParametersPerMethod
-      enabled: true
-      options:
-        m_limit: 5
+
+name: "Long Parameter List 129793"
+baseProfile: empty
+inspections:
+  - inspection: ParametersPerMethod
+    enabled: true
+    options:
+      m_limit: 5
