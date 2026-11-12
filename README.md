@@ -212,7 +212,7 @@ The workflow is defined in `.github/workflows/maven.yml`.
 **Workflow configuration:**
 - **Name:** Java CI with Maven
 - **Operating System:** Ubuntu (latest)
-- **Java Version:** JDK 17 (Temurin)
+- **Java Version:** JDK 21 (Temurin)
 - **Build Tool:** Apache Maven
 - **Testing Framework:** JUnit
 
@@ -222,7 +222,7 @@ The workflow is defined in `.github/workflows/maven.yml`.
 
 **Execution steps:**
 1. Checkout the repository.
-2. Configure JDK 17 and Maven dependency caching.
+2. Configure JDK 21 and Maven dependency caching.
 3. Build the project and execute unit tests using:
 
 ```bash
