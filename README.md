@@ -202,6 +202,39 @@ mvn test
 
 ---
 
+### GitHub Actions - Automated Unit Tests
+
+The project uses GitHub Actions to automatically build
+and test the Battleship2 application.
+
+The workflow is defined in `.github/workflows/maven.yml`.
+
+**Workflow configuration:**
+- **Name:** Java CI with Maven
+- **Operating System:** Ubuntu (latest)
+- **Java Version:** JDK 17 (Temurin)
+- **Build Tool:** Apache Maven
+- **Testing Framework:** JUnit
+
+**Workflow triggers:**
+- Every push to any branch.
+- Pull requests targeting the main branch.
+
+**Execution steps:**
+1. Checkout the repository.
+2. Configure JDK 17 and Maven dependency caching.
+3. Build the project and execute unit tests using:
+
+```bash
+mvn -B clean verify --file pom.xml
+```
+
+The workflow reports whether the build and unit tests
+have completed successfully.
+
+This automated testing process helps detect errors
+before changes are integrated into the main branch.
+
 ## 🤝 Contributing
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create.
 
