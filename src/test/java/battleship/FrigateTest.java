@@ -168,4 +168,73 @@ public class FrigateTest {
 		assertThrows(NullPointerException.class, () -> new Frigate(Compass.NORTH, null),
 				"Error: NullPointerException should be thrown for null position.");
 	}
+
+	@Test
+	void testConstructorSouth() {
+		Frigate south = new Frigate(
+				Compass.SOUTH, new Position(2, 3));
+
+		assertEquals("Fragata", south.getCategory());
+		assertEquals(Compass.SOUTH, south.getBearing());
+		assertEquals(4, south.getSize());
+
+		List<IPosition> positions = south.getPositions();
+
+		assertEquals(4, positions.size());
+		assertEquals(new Position(2, 3), positions.get(0));
+		assertEquals(new Position(3, 3), positions.get(1));
+		assertEquals(new Position(4, 3), positions.get(2));
+		assertEquals(new Position(5, 3), positions.get(3));
+	}
+
+	@Test
+	void testAllBearingsGenerateFourPositions() {
+		for (Compass bearing : Compass.values()) {
+			Frigate ship = new Frigate(
+					bearing, new Position(2, 2));
+
+			assertEquals(4, ship.getPositions().size());
+			assertEquals(4, ship.getSize());
+			assertEquals(bearing, ship.getBearing());
+		}
+	}
+
+	@Test
+	void testFrigateAtBoardBoundary() {
+		Frigate ship = new Frigate(
+				Compass.EAST, new Position(0, 6));
+
+		assertEquals(4, ship.getPositions().size());
+		assertEquals(new Position(0, 6), ship.getPositions().get(0));
+		assertEquals(new Position(0, 9), ship.getPositions().get(3));
+
+		assertTrue(ship.isInsideBoard());
+	}
+
+	@Test
+	void testFrigateOutsideBoard() {
+		Frigate ship = new Frigate(
+				Compass.EAST, new Position(0, 8));
+
+		assertEquals(4, ship.getPositions().size());
+		assertFalse(ship.isInsideBoard());
+	}
+
+	@Test
+	void testFrigateSinkingProgressively() {
+		Frigate ship = new Frigate(
+				Compass.NORTH, new Position(2, 2));
+
+		assertTrue(ship.stillFloating());
+
+		for (int i = 0; i < ship.getSize() - 1; i++) {
+			ship.getPositions().get(i).shoot();
+			assertTrue(ship.stillFloating());
+		}
+
+		ship.getPositions().get(3).shoot();
+
+		assertFalse(ship.stillFloating());
+	}
+
 }
