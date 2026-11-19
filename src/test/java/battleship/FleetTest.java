@@ -186,4 +186,107 @@ import java.util.ArrayList;
 			fleet.addShip(ship);
 			assertDoesNotThrow(fleet::printStatus, "Error: printStatus should not throw any exceptions.");
 		}
+
+	@Test
+	void testGetSunkShips() {
+		IShip ship1 = new Barge(Compass.NORTH, new Position(1, 1));
+		IShip ship2 = new Barge(Compass.NORTH, new Position(5, 5));
+
+		assertTrue(fleet.addShip(ship1));
+		assertTrue(fleet.addShip(ship2));
+
+		// Inicialmente não existem navios afundados
+		assertTrue(fleet.getSunkShips().isEmpty());
+
+		// Afundar o primeiro navio
+		ship1.getPositions().get(0).shoot();
+
+		List<IShip> sunkShips = fleet.getSunkShips();
+
+		assertEquals(1, sunkShips.size());
+		assertEquals(ship1, sunkShips.get(0));
+
+		// Afundar o segundo navio
+		ship2.getPositions().get(0).shoot();
+
+		assertEquals(2, fleet.getSunkShips().size());
+		assertTrue(fleet.getFloatingShips().isEmpty());
 	}
+
+	@Test
+	void testPrintMethods() {
+		IShip ship1 = new Barge(Compass.NORTH, new Position(1, 1));
+		IShip ship2 = new Barge(Compass.NORTH, new Position(5, 5));
+
+		assertTrue(fleet.addShip(ship1));
+		assertTrue(fleet.addShip(ship2));
+
+		assertDoesNotThrow(() -> fleet.printShips(fleet.getShips()));
+		assertDoesNotThrow(() -> fleet.printShipsByCategory("Barca"));
+		assertDoesNotThrow(() -> fleet.printShipsByCategory("Fragata"));
+		assertDoesNotThrow(() -> fleet.printFloatingShips());
+		assertDoesNotThrow(() -> fleet.printAllShips());
+
+		// Verificar também uma lista vazia
+		assertDoesNotThrow(() -> fleet.printShips(List.of()));
+	}
+
+	@Test
+	void testAddShipNull() {
+		assertThrows(AssertionError.class, () -> fleet.addShip(null));
+	}
+
+	@Test
+	void testGetShipsLikeNull() {
+		assertThrows(AssertionError.class, () -> fleet.getShipsLike(null));
+	}
+
+	@Test
+	void testShipAtNull() {
+		assertThrows(AssertionError.class, () -> fleet.shipAt(null));
+	}
+
+	@Test
+	void testPrintShipsNull() {
+		assertThrows(AssertionError.class, () -> fleet.printShips(null));
+	}
+
+	@Test
+	void testPrintShipsByCategoryNull() {
+		assertThrows(AssertionError.class,
+				() -> fleet.printShipsByCategory(null));
+	}
+
+	@Test
+	void testColisionRiskNull() throws Exception {
+		var method = Fleet.class.getDeclaredMethod("colisionRisk", IShip.class);
+		method.setAccessible(true);
+
+		java.lang.reflect.InvocationTargetException exception =
+				assertThrows(
+						java.lang.reflect.InvocationTargetException.class,
+						() -> method.invoke(fleet, new Object[]{null})
+				);
+
+		assertInstanceOf(AssertionError.class, exception.getCause());
+	}
+
+	@Test
+	void testAddShipWhenFleetExceedsLimit() {
+		// getShips() devolve a lista interna da frota.
+		// Permite preparar o cenário sem alterar Fleet.java.
+		for (int i = 0; i <= Fleet.FLEET_SIZE; i++) {
+			fleet.getShips().add(
+					new Barge(Compass.NORTH, new Position(1, 1))
+			);
+		}
+
+		IShip extraShip = new Barge(
+				Compass.NORTH, new Position(5, 5)
+		);
+
+		assertFalse(fleet.addShip(extraShip));
+		assertEquals(Fleet.FLEET_SIZE + 1, fleet.getShips().size());
+	}
+
+}
