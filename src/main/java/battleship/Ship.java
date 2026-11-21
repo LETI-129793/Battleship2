@@ -4,9 +4,11 @@
 package battleship;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.ToIntFunction;
 
 /**
  * The type Ship.
@@ -238,11 +240,7 @@ public abstract class Ship implements IShip
     @Override
     public int getTopMostPos()
     {
-	int top = getPositions().get(0).getRow();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getRow() < top)
-		top = getPositions().get(i).getRow();
-	return top;
+	return findExtremePosition(IPosition::getRow, Comparator.naturalOrder());
     }
 
 	/**
@@ -258,11 +256,7 @@ public abstract class Ship implements IShip
     @Override
     public int getBottomMostPos()
     {
-	int bottom = getPositions().get(0).getRow();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getRow() > bottom)
-			bottom = getPositions().get(i).getRow();
-	return bottom;
+	return findExtremePosition(IPosition::getRow, Comparator.reverseOrder());
     }
 
 	/**
@@ -278,11 +272,7 @@ public abstract class Ship implements IShip
     @Override
     public int getLeftMostPos()
     {
-	int left = getPositions().get(0).getColumn();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getColumn() < left)
-			left = getPositions().get(i).getColumn();
-	return left;
+	return findExtremePosition(IPosition::getColumn, Comparator.naturalOrder());
     }
 
 	/**
@@ -298,12 +288,20 @@ public abstract class Ship implements IShip
     @Override
     public int getRightMostPos()
     {
-	int right = getPositions().get(0).getColumn();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getColumn() > right)
-		right = getPositions().get(i).getColumn();
-	return right;
+	return findExtremePosition(IPosition::getColumn, Comparator.reverseOrder());
     }
+
+	private int findExtremePosition(ToIntFunction<IPosition> coordinate, Comparator<Integer> comparator)
+	{
+		int extreme = coordinate.applyAsInt(getPositions().get(0));
+		for (int i = 1; i < getSize(); i++)
+		{
+			int candidate = coordinate.applyAsInt(getPositions().get(i));
+			if (comparator.compare(candidate, extreme) < 0)
+				extreme = candidate;
+		}
+		return extreme;
+	}
 
 	/**
 	 * Occupies boolean.
