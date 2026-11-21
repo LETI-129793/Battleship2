@@ -24,12 +24,12 @@ public class Position implements IPosition {
 	/**
 	 * Indicates whether the position is occupied by a ship.
 	 */
-	private boolean isOccupied;
+	private boolean occupied;
 
 	/**
 	 * Indicates whether the position has been hit by an attack.
 	 */
-	private boolean isHit;
+	private boolean hit;
 
 	//------------------------------------------------------------------
 	public static IPosition randomPosition() {
@@ -60,8 +60,8 @@ public class Position implements IPosition {
 	public Position(int row, int column) {
 		this.row = row;
 		this.column = column;
-		this.isOccupied = false;
-		this.isHit = false;
+		this.occupied = false;
+		this.hit = false;
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public boolean isOccupied() {
-		return isOccupied;
+		return occupied;
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public boolean isHit() {
-		return isHit;
+		return hit;
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public void occupy() {
-		isOccupied = true;
+		occupied = true;
 	}
 
 	/**
@@ -191,7 +191,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public void shoot() {
-		isHit = true;
+		hit = true;
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(row, column, isOccupied, isHit);
+		return Objects.hash(row, column, occupied, hit);
 	}
 
 	/**
