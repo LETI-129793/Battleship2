@@ -11,7 +11,7 @@ A Parte 2, A.2 do guião pede uma tabela com quatro colunas: localização (`cla
 | :--- | :--- | :--- | :--- |
 | `Move::processEnemyFire` | **Long Method** — ~140 linhas que contam os resultados, constroem a mensagem para a consola e constroem o JSON | **Extract Method** — extrair a construção da mensagem *verbose* (`buildSummary`) e a construção do mapa de resposta (`buildResponse`) | 129785 |
 | `Move` | **Large Class / Divergent Change** — a classe de domínio também trata da serialização JSON com Jackson (`ObjectMapper`) | **Extract Class** — mover a serialização dos resultados para uma nova classe (ex.: `MoveResultSerializer`) | 129785 |
-| `Move::getShots` / `Move::getShotResults` | **Exposed Internal State** — devolvem diretamente as listas internas mutáveis | **Encapsulate Collection** — devolver `List.copyOf(...)` / `Collections.unmodifiableList(...)` | 129785 |
+| `Position::randomPosition` | **Dependência da implementação concreta** — devolve a classe `Position`, enquanto o resto do código trabalha com a interface `IPosition` | **Type Migration** — migrar o tipo de retorno de `Position` para `IPosition` (o IntelliJ propaga a alteração ao parâmetro de `Ship::buildShip`) | 129785 |
 | `Position::Position(char, int)` | **Constructor ambíguo** — dois construtores com assinaturas parecidas (`(char,int)` e `(int,int)`) e significados diferentes (coordenadas clássicas vs. índices) | **Replace Constructor with Factory Method** — criar `Position.fromClassic(char, int)` | 129785 |
 | `Position` (campos `isOccupied`, `isHit`) | **Nomes enganadores** — os campos têm o mesmo nome que os métodos `isOccupied()` / `isHit()` | **Rename Field** — renomear para `occupied` e `hit` | 129785 |
 | `Position::adjacentPositions` | **Magic Number / Constant Expression** — a matriz `directions` é um literal recriado em cada chamada | **Introduce Constant** — extrair para `private static final int[][] DIRECTIONS` | 129785 |
@@ -38,7 +38,7 @@ A Parte 2, A.2 do guião pede uma tabela com quatro colunas: localização (`cla
 
 | Aluno | Refabricações (8 tipos diferentes) |
 | :--- | :--- |
-| 129785 | Extract Method, Extract Class, Encapsulate Collection, Replace Constructor with Factory Method, Rename Field, Introduce Constant, Introduce Variable, Move Inner Class to Upper Level |
+| 129785 | Extract Method, Extract Class, Type Migration, Replace Constructor with Factory Method, Rename Field, Introduce Constant, Introduce Variable, Move Inner Class to Upper Level |
 | 129780 | Pull Up Method, Extract Method, Remove Dead Code, Change Visibility, Type Migration, Rename Method, Replace Loop with Pipeline, Introduce Constant |
 | 129793 | Extract Method, Replace with Constant, Introduce Variable, Inline Variable, Introduce Parameter Object, Rename, Move Method, Replace Loop with Pipeline |
 
