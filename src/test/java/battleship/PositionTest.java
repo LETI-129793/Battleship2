@@ -40,7 +40,7 @@ public class PositionTest {
 	@Test
 	@DisplayName("Deve gerar uma posição aleatória válida com randomPosition()")
 	void randomPositionTest() {
-		Position randomPos = Position.randomPosition();
+		IPosition randomPos = Position.randomPosition();
 		assertNotNull(randomPos);
 		assertTrue(randomPos.isInside());
 	}
