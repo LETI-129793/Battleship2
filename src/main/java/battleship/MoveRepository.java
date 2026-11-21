@@ -33,32 +33,6 @@ public class MoveRepository implements AutoCloseable {
      */
     public static final String DEFAULT_URL = "jdbc:h2:./data/battleship";
 
-    /**
-     * Um tiro guardado na base de dados.
-     */
-    public record StoredShot(String position, boolean valid, boolean repeated, String shipCategory, boolean sunk) {
-        @Override
-        public String toString() {
-            if (!valid)
-                return position + " (exterior)";
-            if (repeated)
-                return position + " (repetido)";
-            if (shipCategory == null)
-                return position + " (água)";
-            return position + " (" + shipCategory + (sunk ? ", afundado)" : ")");
-        }
-    }
-
-    /**
-     * Uma jogada guardada na base de dados.
-     */
-    public record StoredMove(long gameId, int number, LocalDateTime playedAt, List<StoredShot> shots) {
-        @Override
-        public String toString() {
-            return "Jogo " + gameId + " | Jogada nº" + number + " | " + playedAt.withNano(0) + " | " + shots;
-        }
-    }
-
     private final Connection connection;
 
     /**
@@ -151,7 +125,8 @@ public class MoveRepository implements AutoCloseable {
                     ps.setString(3, shots.get(i).toString());
                     ps.setBoolean(4, result.valid());
                     ps.setBoolean(5, result.repeated());
-                    ps.setString(6, result.ship() == null ? null : result.ship().getCategory());
+                    IShip ship = result.ship();
+                    ps.setString(6, ship == null ? null : ship.getCategory());
                     ps.setBoolean(7, result.sunk());
                     ps.addBatch();
                 }

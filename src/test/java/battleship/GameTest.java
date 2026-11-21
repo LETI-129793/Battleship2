@@ -392,7 +392,7 @@ public class GameTest {
 					new Position(3, 3)
 			));
 
-			List<MoveRepository.StoredMove> savedMoves =
+			List<StoredMove> savedMoves =
 					repository.findMovesByGame(dbGame.getGameId());
 
 			assertEquals(1, savedMoves.size());
@@ -420,7 +420,7 @@ public class GameTest {
 					new Position(6, 6)
 			));
 
-			List<MoveRepository.StoredMove> savedMoves =
+			List<StoredMove> savedMoves =
 					repository.findMovesByGame(dbGame.getGameId());
 
 			assertEquals(2, savedMoves.size());

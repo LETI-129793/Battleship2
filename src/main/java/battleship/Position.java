@@ -22,34 +22,46 @@ public class Position implements IPosition {
 	private final int column;
 
 	/**
+	 * The eight neighbouring directions (row offset, column offset) of a position.
+	 */
+	private static final int[][] DIRECTIONS = {
+			{-1, 0},  // north
+			{0, 1},   // east
+			{1, 0},   // south
+			{0, -1},   // west
+			{1, 1},   // northeast
+			{1, -1},  // northwest
+			{-1, 1},  // southeast
+			{-1, -1} // southwest
+	};
+
+	/**
 	 * Indicates whether the position is occupied by a ship.
 	 */
-	private boolean isOccupied;
+	private boolean occupied;
 
 	/**
 	 * Indicates whether the position has been hit by an attack.
 	 */
-	private boolean isHit;
+	private boolean hit;
 
 	//------------------------------------------------------------------
-	public static Position randomPosition() {
+	public static IPosition randomPosition() {
 		// Generate random position on the board
 		int row = (int) (Math.random() * Game.BOARD_SIZE);
 		int col = (int) (Math.random() * Game.BOARD_SIZE);
 		return new Position(row, col);
 	}
 	/**
-	 * Constructs a new Position with the specified row and column.
+	 * Creates a Position from classic board coordinates (e.g. 'C', 4).
 	 * By default, the position is not occupied and not hit.
 	 *
-	 * @param classicRow    the row coordinate of the position
-	 * @param classicColumn the column coordinate of the position
+	 * @param classicRow    the row letter of the position ('A', 'B', ...)
+	 * @param classicColumn the column number of the position, starting at 1
+	 * @return the corresponding position
 	 */
-	public Position(char classicRow, int classicColumn) {
-		this.row = Character.toUpperCase(classicRow) - 'A';
-		this.column = classicColumn-1;
-		this.isOccupied = false;
-		this.isHit = false;
+	public static Position fromClassic(char classicRow, int classicColumn) {
+		return new Position(Character.toUpperCase(classicRow) - 'A', classicColumn - 1);
 	}
 
 	/**
@@ -62,8 +74,8 @@ public class Position implements IPosition {
 	public Position(int row, int column) {
 		this.row = row;
 		this.column = column;
-		this.isOccupied = false;
-		this.isHit = false;
+		this.occupied = false;
+		this.hit = false;
 	}
 
 	/**
@@ -136,20 +148,8 @@ public class Position implements IPosition {
 
 		List<IPosition> adjacents = new ArrayList<IPosition>();
 
-		// Define possible directions (up, right, down, left)
-		int[][] directions = {
-				{-1, 0},  // north
-				{0, 1},   // east
-				{1, 0},   // south
-				{0, -1},   // west
-				{1, 1},   // northeast
-				{1, -1},  // northwest
-				{-1, 1},  // southeast
-				{-1, -1} // southwest
-		};
-
 		// Check each possible direction
-		for (int[] dir : directions) {
+		for (int[] dir : DIRECTIONS) {
 			Position newPosition = new Position(row + dir[0], column + dir[1]);
 			// Only add the position if it's inside the board boundaries
 			if (newPosition.isInside()) {
@@ -167,7 +167,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public boolean isOccupied() {
-		return isOccupied;
+		return occupied;
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public boolean isHit() {
-		return isHit;
+		return hit;
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public void occupy() {
-		isOccupied = true;
+		occupied = true;
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public void shoot() {
-		isHit = true;
+		hit = true;
 	}
 
 	/**
@@ -222,7 +222,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(row, column, isOccupied, isHit);
+		return Objects.hash(row, column, occupied, hit);
 	}
 
 	/**
