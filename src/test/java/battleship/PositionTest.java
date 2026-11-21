@@ -40,7 +40,7 @@ public class PositionTest {
 	@Test
 	@DisplayName("Deve gerar uma posição aleatória válida com randomPosition()")
 	void randomPositionTest() {
-		Position randomPos = Position.randomPosition();
+		IPosition randomPos = Position.randomPosition();
 		assertNotNull(randomPos);
 		assertTrue(randomPos.isInside());
 	}
@@ -48,7 +48,7 @@ public class PositionTest {
 	@Test
 	@DisplayName("Deve construir Position com linha e coluna clássicas e obter getClassicColumn()")
 	void classicConstructorAndClassicColumnTest() {
-		Position pos = new Position('c', 4);
+		Position pos = Position.fromClassic('c', 4);
 		assertEquals(2, pos.getRow());
 		assertEquals(3, pos.getColumn());
 		assertEquals('C', pos.getClassicRow());
