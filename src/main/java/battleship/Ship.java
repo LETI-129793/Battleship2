@@ -119,6 +119,23 @@ public abstract class Ship implements IShip
 		positions = new ArrayList<>();
     }
 
+	protected void initializeLinearPositions(Compass bearing, IPosition pos)
+	{
+		switch (bearing)
+		{
+			case NORTH:
+			case SOUTH:
+				for (int r = 0; r < getSize(); r++)
+					getPositions().add(new Position(pos.getRow() + r, pos.getColumn()));
+				break;
+			case EAST:
+			case WEST:
+				for (int c = 0; c < getSize(); c++)
+					getPositions().add(new Position(pos.getRow(), pos.getColumn() + c));
+				break;
+		}
+	}
+
 	/**
 	 * Gets category.
 	 *
