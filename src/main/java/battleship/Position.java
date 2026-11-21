@@ -22,6 +22,20 @@ public class Position implements IPosition {
 	private final int column;
 
 	/**
+	 * The eight neighbouring directions (row offset, column offset) of a position.
+	 */
+	private static final int[][] DIRECTIONS = {
+			{-1, 0},  // north
+			{0, 1},   // east
+			{1, 0},   // south
+			{0, -1},   // west
+			{1, 1},   // northeast
+			{1, -1},  // northwest
+			{-1, 1},  // southeast
+			{-1, -1} // southwest
+	};
+
+	/**
 	 * Indicates whether the position is occupied by a ship.
 	 */
 	private boolean occupied;
@@ -134,20 +148,8 @@ public class Position implements IPosition {
 
 		List<IPosition> adjacents = new ArrayList<IPosition>();
 
-		// Define possible directions (up, right, down, left)
-		int[][] directions = {
-				{-1, 0},  // north
-				{0, 1},   // east
-				{1, 0},   // south
-				{0, -1},   // west
-				{1, 1},   // northeast
-				{1, -1},  // northwest
-				{-1, 1},  // southeast
-				{-1, -1} // southwest
-		};
-
 		// Check each possible direction
-		for (int[] dir : directions) {
+		for (int[] dir : DIRECTIONS) {
 			Position newPosition = new Position(row + dir[0], column + dir[1]);
 			// Only add the position if it's inside the board boundaries
 			if (newPosition.isInside()) {
