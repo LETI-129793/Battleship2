@@ -1,9 +1,5 @@
 package battleship;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 import java.util.*;
 
 /**
@@ -19,6 +15,7 @@ public class Move implements IMove {
 	private final int number;
 	private final List<IPosition> shots;
 	private final List<IGame.ShotResult> shotResults;
+	private final MoveResultSerializer serializer = new MoveResultSerializer();
 
 	//-------------------------------------------------------------------
 	public Move(int moveNumber, List<IPosition> moveShots, List<IGame.ShotResult> moveResults) {
@@ -107,17 +104,7 @@ public class Move implements IMove {
 		Map<String, Object> response = buildResponse(validShots, outsideShots, repeatedShots, missedShots, sunkBoatsCount, hitsPerBoat);
 
 		// Serializar o JSON utilizando Jackson
-		String jsonString;
-
-		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-		try {
-			jsonString = objectMapper.writeValueAsString(response);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Erro ao serializar o JSON dos resultados da jogada", e);
-		}
+		String jsonString = serializer.toJson(response);
 
 		System.out.println(jsonString);
 		System.out.println();
