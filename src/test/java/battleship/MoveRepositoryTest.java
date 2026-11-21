@@ -67,10 +67,10 @@ class MoveRepositoryTest {
         IMove move = new Move(1, shots, results);
         repository.saveMove(gameId, move);
 
-        List<MoveRepository.StoredMove> moves = repository.findMovesByGame(gameId);
+        List<StoredMove> moves = repository.findMovesByGame(gameId);
         assertEquals(1, moves.size());
 
-        MoveRepository.StoredMove storedMove = moves.get(0);
+        StoredMove storedMove = moves.get(0);
         assertEquals(gameId, storedMove.gameId());
         assertEquals(1, storedMove.number());
         assertNotNull(storedMove.playedAt());
@@ -109,11 +109,11 @@ class MoveRepositoryTest {
     @Test
     @DisplayName("Deve formatar corretamente o toString de StoredShot em todos os estados")
     void storedShotToString() {
-        MoveRepository.StoredShot exterior = new MoveRepository.StoredShot("A1", false, false, null, false);
-        MoveRepository.StoredShot repeated = new MoveRepository.StoredShot("A2", true, true, null, false);
-        MoveRepository.StoredShot water = new MoveRepository.StoredShot("A3", true, false, null, false);
-        MoveRepository.StoredShot hit = new MoveRepository.StoredShot("A4", true, false, "Caravela", false);
-        MoveRepository.StoredShot sunk = new MoveRepository.StoredShot("A5", true, false, "Barge", true);
+        StoredShot exterior = new StoredShot("A1", false, false, null, false);
+        StoredShot repeated = new StoredShot("A2", true, true, null, false);
+        StoredShot water = new StoredShot("A3", true, false, null, false);
+        StoredShot hit = new StoredShot("A4", true, false, "Caravela", false);
+        StoredShot sunk = new StoredShot("A5", true, false, "Barge", true);
 
         assertEquals("A1 (exterior)", exterior.toString());
         assertEquals("A2 (repetido)", repeated.toString());
@@ -126,10 +126,10 @@ class MoveRepositoryTest {
     @DisplayName("Deve formatar corretamente o toString de StoredMove")
     void storedMoveToString() {
         LocalDateTime time = LocalDateTime.of(2026, 11, 19, 14, 0, 0, 123456);
-        List<MoveRepository.StoredShot> shots = List.of(
-                new MoveRepository.StoredShot("B2", true, false, null, false)
+        List<StoredShot> shots = List.of(
+                new StoredShot("B2", true, false, null, false)
         );
-        MoveRepository.StoredMove storedMove = new MoveRepository.StoredMove(7L, 2, time, shots);
+        StoredMove storedMove = new StoredMove(7L, 2, time, shots);
 
         assertEquals("Jogo 7 | Jogada nº2 | 2026-11-19T14:00 | [B2 (água)]", storedMove.toString());
     }

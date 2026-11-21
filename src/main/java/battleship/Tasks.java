@@ -200,9 +200,9 @@ public class Tasks {
 			return;
 		}
 		try {
-			List<MoveRepository.StoredMove> moves = repository.findMovesByGame(g.getGameId());
+			List<StoredMove> moves = repository.findMovesByGame(g.getGameId());
 			System.out.println("Jogadas guardadas do jogo nº" + g.getGameId() + ": " + moves.size());
-			for (MoveRepository.StoredMove move : moves)
+			for (StoredMove move : moves)
 				System.out.println(move);
 		} catch (SQLException e) {
 			LOGGER.error("Erro ao ler o histórico de jogadas", e);
