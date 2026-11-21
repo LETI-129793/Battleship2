@@ -151,7 +151,8 @@ public class MoveRepository implements AutoCloseable {
                     ps.setString(3, shots.get(i).toString());
                     ps.setBoolean(4, result.valid());
                     ps.setBoolean(5, result.repeated());
-                    ps.setString(6, result.ship() == null ? null : result.ship().getCategory());
+                    IShip ship = result.ship();
+                    ps.setString(6, ship == null ? null : ship.getCategory());
                     ps.setBoolean(7, result.sunk());
                     ps.addBatch();
                 }
