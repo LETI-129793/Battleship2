@@ -1,0 +1,416 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MoveRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: MoveRepository (battleship)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MoveRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92,9%
+  </span>
+  <span class="absValue">
+    (13/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97%
+  </span>
+  <span class="absValue">
+    (65/67)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MoveRepository$StoredMove</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MoveRepository$StoredShot</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95,5%
+  </span>
+  <span class="absValue">
+    (21/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97,4%
+  </span>
+  <span class="absValue">
+    (75/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.DriverManager;
+&nbsp;import java.sql.PreparedStatement;
+&nbsp;import java.sql.ResultSet;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.sql.Statement;
+&nbsp;import java.sql.Timestamp;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.apache.logging.log4j.LogManager;
+&nbsp;import org.apache.logging.log4j.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; * Armazena os jogos e as jogadas numa base de dados H2 (via JDBC).
+&nbsp; * &lt;p&gt;
+&nbsp; * Esquema:
+&nbsp; * &lt;ul&gt;
+&nbsp; *     &lt;li&gt;GAMES  - um registo por jogo iniciado&lt;/li&gt;
+&nbsp; *     &lt;li&gt;MOVES  - uma jogada (rajada de {@link Game#NUMBER_SHOTS} tiros) de um jogo&lt;/li&gt;
+&nbsp; *     &lt;li&gt;SHOTS  - cada tiro de uma jogada, com o respetivo resultado&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; */
+<b class="fc">&nbsp;public class MoveRepository implements AutoCloseable {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LogManager.getLogger();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Base de dados em ficheiro, criada na pasta de trabalho (./data/battleship.mv.db)
+&nbsp;     */
+&nbsp;    public static final String DEFAULT_URL = &quot;jdbc:h2:./data/battleship&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Um tiro guardado na base de dados.
+&nbsp;     */
+<b class="fc">&nbsp;    public record StoredShot(String position, boolean valid, boolean repeated, String shipCategory, boolean sunk) {</b>
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="fc">&nbsp;            if (!valid)</b>
+<b class="fc">&nbsp;                return position + &quot; (exterior)&quot;;</b>
+<b class="fc">&nbsp;            if (repeated)</b>
+<b class="fc">&nbsp;                return position + &quot; (repetido)&quot;;</b>
+<b class="fc">&nbsp;            if (shipCategory == null)</b>
+<b class="fc">&nbsp;                return position + &quot; (água)&quot;;</b>
+<b class="fc">&nbsp;            return position + &quot; (&quot; + shipCategory + (sunk ? &quot;, afundado)&quot; : &quot;)&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Uma jogada guardada na base de dados.
+&nbsp;     */
+<b class="fc">&nbsp;    public record StoredMove(long gameId, int number, LocalDateTime playedAt, List&lt;StoredShot&gt; shots) {</b>
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="fc">&nbsp;            return &quot;Jogo &quot; + gameId + &quot; | Jogada nº&quot; + number + &quot; | &quot; + playedAt.withNano(0) + &quot; | &quot; + shots;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Connection connection;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Abre (ou cria) a base de dados no URL indicado e garante que as tabelas existem.
+&nbsp;     *
+&nbsp;     * @param jdbcUrl URL JDBC da base de dados H2, p.ex. &quot;jdbc:h2:mem:teste&quot; ou {@link #DEFAULT_URL}
+&nbsp;     * @throws SQLException se não for possível ligar à base de dados
+&nbsp;     */
+<b class="fc">&nbsp;    public MoveRepository(String jdbcUrl) throws SQLException {</b>
+<b class="fc">&nbsp;        this.connection = DriverManager.getConnection(jdbcUrl, &quot;sa&quot;, &quot;&quot;);</b>
+<b class="fc">&nbsp;        createTables();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createTables() throws SQLException {
+<b class="fc">&nbsp;        try (Statement st = connection.createStatement()) {</b>
+<b class="fc">&nbsp;            st.execute(&quot;&quot;&quot;</b>
+&nbsp;					CREATE TABLE IF NOT EXISTS GAMES (
+&nbsp;					    ID         BIGINT AUTO_INCREMENT PRIMARY KEY,
+&nbsp;					    STARTED_AT TIMESTAMP NOT NULL
+&nbsp;					)&quot;&quot;&quot;);
+<b class="fc">&nbsp;            st.execute(&quot;&quot;&quot;</b>
+&nbsp;					CREATE TABLE IF NOT EXISTS MOVES (
+&nbsp;					    ID          BIGINT AUTO_INCREMENT PRIMARY KEY,
+&nbsp;					    GAME_ID     BIGINT NOT NULL REFERENCES GAMES(ID),
+&nbsp;					    MOVE_NUMBER INT NOT NULL,
+&nbsp;					    PLAYED_AT   TIMESTAMP NOT NULL
+&nbsp;					)&quot;&quot;&quot;);
+<b class="fc">&nbsp;            st.execute(&quot;&quot;&quot;</b>
+&nbsp;					CREATE TABLE IF NOT EXISTS SHOTS (
+&nbsp;					    ID            BIGINT AUTO_INCREMENT PRIMARY KEY,
+&nbsp;					    MOVE_ID       BIGINT NOT NULL REFERENCES MOVES(ID),
+&nbsp;					    SHOT_INDEX    INT NOT NULL,
+&nbsp;					    POSITION      VARCHAR(16) NOT NULL,
+&nbsp;					    IS_VALID      BOOLEAN NOT NULL,
+&nbsp;					    IS_REPEATED   BOOLEAN NOT NULL,
+&nbsp;					    SHIP_CATEGORY VARCHAR(20),
+&nbsp;					    IS_SUNK       BOOLEAN NOT NULL
+&nbsp;					)&quot;&quot;&quot;);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Regista o início de um novo jogo.
+&nbsp;     *
+&nbsp;     * @return o identificador do jogo criado
+&nbsp;     * @throws SQLException em caso de erro na base de dados
+&nbsp;     */
+&nbsp;    public long startGame() throws SQLException {
+<b class="fc">&nbsp;        try (PreparedStatement ps = connection.prepareStatement(</b>
+&nbsp;                &quot;INSERT INTO GAMES (STARTED_AT) VALUES (?)&quot;, Statement.RETURN_GENERATED_KEYS)) {
+<b class="fc">&nbsp;            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));</b>
+<b class="fc">&nbsp;            ps.executeUpdate();</b>
+<b class="fc">&nbsp;            return generatedKey(ps);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Guarda uma jogada e todos os seus tiros numa única transação.
+&nbsp;     *
+&nbsp;     * @param gameId identificador do jogo (obtido com {@link #startGame()})
+&nbsp;     * @param move   a jogada a guardar
+&nbsp;     * @throws SQLException em caso de erro na base de dados
+&nbsp;     */
+&nbsp;    public void saveMove(long gameId, IMove move) throws SQLException {
+<b class="fc">&nbsp;        assert move != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean autoCommit = connection.getAutoCommit();</b>
+<b class="fc">&nbsp;        connection.setAutoCommit(false);</b>
+&nbsp;        try {
+&nbsp;            long moveId;
+<b class="fc">&nbsp;            try (PreparedStatement ps = connection.prepareStatement(</b>
+&nbsp;                    &quot;INSERT INTO MOVES (GAME_ID, MOVE_NUMBER, PLAYED_AT) VALUES (?, ?, ?)&quot;,
+&nbsp;                    Statement.RETURN_GENERATED_KEYS)) {
+<b class="fc">&nbsp;                ps.setLong(1, gameId);</b>
+<b class="fc">&nbsp;                ps.setInt(2, move.getNumber());</b>
+<b class="fc">&nbsp;                ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));</b>
+<b class="fc">&nbsp;                ps.executeUpdate();</b>
+<b class="fc">&nbsp;                moveId = generatedKey(ps);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            try (PreparedStatement ps = connection.prepareStatement(</b>
+&nbsp;                    &quot;INSERT INTO SHOTS (MOVE_ID, SHOT_INDEX, POSITION, IS_VALID, IS_REPEATED, SHIP_CATEGORY, IS_SUNK) &quot; +
+&nbsp;                            &quot;VALUES (?, ?, ?, ?, ?, ?, ?)&quot;)) {
+<b class="fc">&nbsp;                List&lt;IPosition&gt; shots = move.getShots();</b>
+<b class="fc">&nbsp;                List&lt;IGame.ShotResult&gt; results = move.getShotResults();</b>
+<b class="fc">&nbsp;                for (int i = 0; i &lt; shots.size(); i++) {</b>
+<b class="fc">&nbsp;                    IGame.ShotResult result = results.get(i);</b>
+<b class="fc">&nbsp;                    ps.setLong(1, moveId);</b>
+<b class="fc">&nbsp;                    ps.setInt(2, i);</b>
+<b class="fc">&nbsp;                    ps.setString(3, shots.get(i).toString());</b>
+<b class="fc">&nbsp;                    ps.setBoolean(4, result.valid());</b>
+<b class="fc">&nbsp;                    ps.setBoolean(5, result.repeated());</b>
+<b class="fc">&nbsp;                    ps.setString(6, result.ship() == null ? null : result.ship().getCategory());</b>
+<b class="fc">&nbsp;                    ps.setBoolean(7, result.sunk());</b>
+<b class="fc">&nbsp;                    ps.addBatch();</b>
+&nbsp;                }
+<b class="fc">&nbsp;                ps.executeBatch();</b>
+&nbsp;            }
+<b class="fc">&nbsp;            connection.commit();</b>
+&nbsp;        } catch (SQLException e) {
+<b class="fc">&nbsp;            connection.rollback();</b>
+&nbsp;            throw e;
+&nbsp;        } finally {
+<b class="fc">&nbsp;            connection.setAutoCommit(autoCommit);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtém todas as jogadas guardadas de um jogo, ordenadas pelo número da jogada.
+&nbsp;     *
+&nbsp;     * @param gameId identificador do jogo
+&nbsp;     * @return a lista de jogadas (vazia se não existirem)
+&nbsp;     * @throws SQLException em caso de erro na base de dados
+&nbsp;     */
+&nbsp;    public List&lt;StoredMove&gt; findMovesByGame(long gameId) throws SQLException {
+<b class="fc">&nbsp;        List&lt;StoredMove&gt; moves = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        try (PreparedStatement ps = connection.prepareStatement(</b>
+&nbsp;                &quot;SELECT ID, MOVE_NUMBER, PLAYED_AT FROM MOVES WHERE GAME_ID = ? ORDER BY MOVE_NUMBER&quot;)) {
+<b class="fc">&nbsp;            ps.setLong(1, gameId);</b>
+<b class="fc">&nbsp;            try (ResultSet rs = ps.executeQuery()) {</b>
+<b class="fc">&nbsp;                while (rs.next()) {</b>
+<b class="fc">&nbsp;                    moves.add(new StoredMove(gameId, rs.getInt(&quot;MOVE_NUMBER&quot;),</b>
+<b class="fc">&nbsp;                            rs.getTimestamp(&quot;PLAYED_AT&quot;).toLocalDateTime(), findShotsByMove(rs.getLong(&quot;ID&quot;))));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return moves;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtém os identificadores de todos os jogos guardados.
+&nbsp;     *
+&nbsp;     * @return lista de identificadores, do mais antigo para o mais recente
+&nbsp;     * @throws SQLException em caso de erro na base de dados
+&nbsp;     */
+&nbsp;    public List&lt;Long&gt; findAllGameIds() throws SQLException {
+<b class="fc">&nbsp;        List&lt;Long&gt; ids = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        try (Statement st = connection.createStatement();</b>
+<b class="fc">&nbsp;             ResultSet rs = st.executeQuery(&quot;SELECT ID FROM GAMES ORDER BY ID&quot;)) {</b>
+<b class="fc">&nbsp;            while (rs.next())</b>
+<b class="fc">&nbsp;                ids.add(rs.getLong(&quot;ID&quot;));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return ids;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;StoredShot&gt; findShotsByMove(long moveId) throws SQLException {
+<b class="fc">&nbsp;        List&lt;StoredShot&gt; shots = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        try (PreparedStatement ps = connection.prepareStatement(</b>
+&nbsp;                &quot;SELECT POSITION, IS_VALID, IS_REPEATED, SHIP_CATEGORY, IS_SUNK FROM SHOTS WHERE MOVE_ID = ? ORDER BY SHOT_INDEX&quot;)) {
+<b class="fc">&nbsp;            ps.setLong(1, moveId);</b>
+<b class="fc">&nbsp;            try (ResultSet rs = ps.executeQuery()) {</b>
+<b class="fc">&nbsp;                while (rs.next()) {</b>
+<b class="fc">&nbsp;                    shots.add(new StoredShot(rs.getString(&quot;POSITION&quot;), rs.getBoolean(&quot;IS_VALID&quot;),</b>
+<b class="fc">&nbsp;                            rs.getBoolean(&quot;IS_REPEATED&quot;), rs.getString(&quot;SHIP_CATEGORY&quot;), rs.getBoolean(&quot;IS_SUNK&quot;)));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return shots;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long generatedKey(Statement st) throws SQLException {
+<b class="fc">&nbsp;        try (ResultSet keys = st.getGeneratedKeys()) {</b>
+<b class="pc">&nbsp;            if (!keys.next())</b>
+<b class="nc">&nbsp;                throw new SQLException(&quot;Nenhuma chave gerada pela base de dados&quot;);</b>
+<b class="fc">&nbsp;            return keys.getLong(1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+&nbsp;        try {
+<b class="fc">&nbsp;            connection.close();</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Erro ao fechar a base de dados&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-21 13:33</div>
+</div>
+</body>
+</html>
