@@ -39,17 +39,15 @@ public class Position implements IPosition {
 		return new Position(row, col);
 	}
 	/**
-	 * Constructs a new Position with the specified row and column.
+	 * Creates a Position from classic board coordinates (e.g. 'C', 4).
 	 * By default, the position is not occupied and not hit.
 	 *
-	 * @param classicRow    the row coordinate of the position
-	 * @param classicColumn the column coordinate of the position
+	 * @param classicRow    the row letter of the position ('A', 'B', ...)
+	 * @param classicColumn the column number of the position, starting at 1
+	 * @return the corresponding position
 	 */
-	public Position(char classicRow, int classicColumn) {
-		this.row = Character.toUpperCase(classicRow) - 'A';
-		this.column = classicColumn-1;
-		this.isOccupied = false;
-		this.isHit = false;
+	public static Position fromClassic(char classicRow, int classicColumn) {
+		return new Position(Character.toUpperCase(classicRow) - 'A', classicColumn - 1);
 	}
 
 	/**
