@@ -200,9 +200,9 @@ public class Tasks {
 			return;
 		}
 		try {
-			List<MoveRepository.StoredMove> moves = repository.findMovesByGame(g.getGameId());
+			List<StoredMove> moves = repository.findMovesByGame(g.getGameId());
 			System.out.println("Jogadas guardadas do jogo nº" + g.getGameId() + ": " + moves.size());
-			for (MoveRepository.StoredMove move : moves)
+			for (StoredMove move : moves)
 				System.out.println(move);
 		} catch (SQLException e) {
 			LOGGER.error("Erro ao ler o histórico de jogadas", e);
@@ -315,11 +315,11 @@ public class Tasks {
 		if (input.matches("[A-Z]\\d+")) {
 			char column = input.charAt(0); // Extrair a coluna
 			int row = Integer.parseInt(input.substring(1)); // Extrair a linha
-			return new Position(column, row);
+			return Position.fromClassic(column, row);
 		} else if (part2 != null && part1.matches("[A-Z]") && part2.matches("\\d+")) {
 			char column = part1.charAt(0); // Extrair a coluna
 			int row = Integer.parseInt(part2); // Extrair a linha
-			return new Position(column, row);
+			return Position.fromClassic(column, row);
 		} else {
 			throw new IllegalArgumentException("Formato inválido. Use 'A3', 'A 3' ou similar.");
 		}

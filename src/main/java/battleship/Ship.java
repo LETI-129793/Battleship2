@@ -42,7 +42,7 @@ public abstract class Ship implements IShip
 	 * @param pos      the pos
 	 * @return s ship
 	 */
-	static Ship buildShip(String shipKind, Compass bearing, Position pos)
+	static Ship buildShip(String shipKind, Compass bearing, IPosition pos)
     {
 		assert shipKind != null;
 		assert bearing != null;

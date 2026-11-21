@@ -336,7 +336,7 @@ public class Game implements IGame
 				// Caso seja somente uma coluna ("A", "B", etc.), esperar o próximo número
 				if (inputScanner.hasNextInt()) {
 					int row = inputScanner.nextInt();
-					shots.add(new Position(token.toUpperCase().charAt(0), row));
+					shots.add(Position.fromClassic(token.toUpperCase().charAt(0), row));
 				} else {
 					throw new IllegalArgumentException("Posição incompleta! A coluna '" + token + "' não é seguida por uma linha.");
 				}
