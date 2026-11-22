@@ -31,7 +31,7 @@ class TasksTest {
 
 		Scanner scanner = new Scanner("A3");
 
-		IPosition position = Tasks.readClassicPosition(scanner);
+		IPosition position = Position.parseClassic(scanner);
 
 		assertEquals(new Position(0, 2), position);
 
@@ -43,14 +43,14 @@ class TasksTest {
 		Scanner scanner1 = new Scanner("AB3");
 
 		assertThrows(IllegalArgumentException.class,
-				() -> Tasks.readClassicPosition(scanner1));
+				() -> Position.parseClassic(scanner1));
 
 		scanner1.close();
 
 		Scanner scanner2 = new Scanner("");
 
 		assertThrows(IllegalArgumentException.class,
-				() -> Tasks.readClassicPosition(scanner2));
+				() -> Position.parseClassic(scanner2));
 
 		scanner2.close();
 	}
@@ -59,7 +59,7 @@ class TasksTest {
 	void taskC() {
 		Scanner scanner = new Scanner("A 3");
 
-		IPosition position = Tasks.readClassicPosition(scanner);
+		IPosition position = Position.parseClassic(scanner);
 
 		assertEquals(new Position(0, 2), position);
 
@@ -70,7 +70,7 @@ class TasksTest {
 	void taskD() {
 		Scanner scanner = new Scanner("a3");
 
-		IPosition position = Tasks.readClassicPosition(scanner);
+		IPosition position = Position.parseClassic(scanner);
 
 		assertEquals(new Position(0, 2), position);
 
