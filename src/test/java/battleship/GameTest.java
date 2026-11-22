@@ -576,13 +576,13 @@ public class GameTest {
 	@Test
 	void printBoardRejectsNullFleet() {
 		assertThrows(AssertionError.class,
-				() -> Game.printBoard(null, List.of(), false, false));
+				() -> Game.printBoard(null, List.of(), new BoardView(false, false)));
 	}
 
 	@Test
 	void printBoardRejectsNullMoves() {
 		assertThrows(AssertionError.class,
-				() -> Game.printBoard(new Fleet(), null, false, false));
+				() -> Game.printBoard(new Fleet(), null, new BoardView(false, false)));
 	}
 
 	@Test

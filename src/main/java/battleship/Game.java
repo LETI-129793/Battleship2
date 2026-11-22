@@ -21,12 +21,9 @@ public class Game implements IGame
 	 *                    and their positions are shown according to their placement.
 	 * @param moves       the list of moves containing shots. If shot positions are shown,
 	 *                    they will be rendered based on their outcome (hit, miss, etc.).
-	 * @param showShots   if true, displays the shots taken during the game and marks
-	 *                    their result (hit or miss) on the board.
-	 * @param showLegend  if true, displays an explanatory legend of the symbols used
-	 *                    to represent various elements such as ships, misses, hits, etc.
+	 * @param boardView options controlling shot and legend display
 	 */
-	public static void printBoard(IFleet fleet, List<IMove> moves, boolean showShots, boolean showLegend) {
+	public static void printBoard(IFleet fleet, List<IMove> moves, BoardView boardView) {
 
 		assert fleet != null;
 		assert moves != null;
@@ -39,12 +36,12 @@ public class Game implements IGame
 
 		printShips(fleet, map);
 
-		if (showShots)
+		if (boardView.showShots())
 			printBoardShots(moves, map);
 
 		printBoardFrame(map);
 
-		if (showLegend) {
+		if (boardView.showLegend()) {
 			System.out.println("          LEGENDA");
 			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
 			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
@@ -480,12 +477,12 @@ public class Game implements IGame
 
 	public void printMyBoard(boolean showShots, boolean showLegend)
 	{
-		Game.printBoard(this.myFleet, this.alienMoves, showShots, showLegend);
+		Game.printBoard(this.myFleet, this.alienMoves, new BoardView(showShots, showLegend));
 	}
 
 	public void printAlienBoard(boolean showShots, boolean showLegend)
 	{
-		Game.printBoard(this.alienFleet, this.myMoves, showShots, showLegend);
+		Game.printBoard(this.alienFleet, this.myMoves, new BoardView(showShots, showLegend));
 	}
 
 	public void over() {
