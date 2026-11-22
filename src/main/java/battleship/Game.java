@@ -475,10 +475,7 @@ public class Game implements IGame
 	{
 		assert pos != null;
 
-		for (IMove move : alienMoves)
-			if (move.getShots().contains(pos))
-				return true;
-		return false;
+		return alienMoves.stream().anyMatch(move -> move.getShots().contains(pos));
 	}
 
 	public void printMyBoard(boolean showShots, boolean showLegend)
