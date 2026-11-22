@@ -100,7 +100,7 @@ public class Tasks {
 						}
 					}
 					break;
-				case "pdf":
+				case PDF:
 					if (game != null) {
 						// Converter as jogadas do jogo para uma lista de texto
 						List<String> movesAsText = game.getAlienMoves().stream()
