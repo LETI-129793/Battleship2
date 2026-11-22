@@ -101,16 +101,7 @@ public class Tasks {
 					}
 					break;
 				case PDF:
-					if (game != null) {
-						// Converter as jogadas do jogo para uma lista de texto
-						List<String> movesAsText = game.getAlienMoves().stream()
-								.map(Object::toString)
-								.toList();
-
-						PDFExporter.exportMovesToPDF(movesAsText, "jogadas_partida.pdf");
-					} else {
-						System.out.println("Inicie um jogo primeiro!");
-					}
+					handlePdf(game);
 					break;
 				case SIMULA:
 					if (game != null) {
@@ -147,6 +138,19 @@ public class Tasks {
 		}
 		closeRepository();
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	private static void handlePdf(IGame game) {
+		if (game != null) {
+			// Converter as jogadas do jogo para uma lista de texto
+			List<String> movesAsText = game.getAlienMoves().stream()
+					.map(Object::toString)
+					.toList();
+
+			PDFExporter.exportMovesToPDF(movesAsText, "jogadas_partida.pdf");
+		} else {
+			System.out.println("Inicie um jogo primeiro!");
+		}
 	}
 
 	/**
