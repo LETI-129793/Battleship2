@@ -432,11 +432,12 @@ public class Game implements IGame
 		else
 		{
 			ship.shoot(pos);
+			boolean sunk = !ship.stillFloating();
 			countHits++;
-			if (!ship.stillFloating()) {
+			if (sunk) {
 				countSinks++;
 			}
-			return new ShotResult(true, false, ship, !ship.stillFloating());
+			return new ShotResult(true, false, ship, sunk);
 		}
 	}
 
