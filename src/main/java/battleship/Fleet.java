@@ -11,6 +11,13 @@ import java.util.List;
  */
 public class Fleet implements IFleet
 {
+	private static final String[] FLEET_COMPOSITION =
+				{"galeao",
+				 "fragata",
+				 "nau", "nau",
+				 "caravela", "caravela", "caravela",
+				 "barca", "barca", "barca", "barca"};
+
 	/**
 	 * Creates a randomly generated fleet containing ships of various predefined types.
 	 * Each ship is assigned a random bearing and position. If a ship cannot be added
@@ -22,20 +29,12 @@ public class Fleet implements IFleet
 
 		IFleet randomFleet = new Fleet();
 
-		// Define the types of ships to be added
-		String[] shipTypes =
-					{"galeao",                           // 1 galleon
-				 	"fragata",                           // 1 frigate
- 				 	"nau", "nau",                        // 2 carracks
-					"caravela", "caravela", "caravela",  // 3 caravels
-					"barca", "barca", "barca", "barca"}; // 4 barges
-
 		int fleetSize = 0;
 
-		while (fleetSize < shipTypes.length) {
+		while (fleetSize < FLEET_COMPOSITION.length) {
 
 			// Build the ship
-			Ship ship = Ship.buildShip(shipTypes[fleetSize], Compass.randomBearing(), Position.randomPosition());
+			Ship ship = Ship.buildShip(FLEET_COMPOSITION[fleetSize], Compass.randomBearing(), Position.randomPosition());
 
 			// Attempt to add the ship to the fleet
 			if (ship != null && randomFleet.addShip(ship)) {
@@ -90,7 +89,7 @@ public class Fleet implements IFleet
 		assert s != null;
 
 		boolean result = false;
-		if ((ships.size() <= FLEET_SIZE) && (s.isInsideBoard()) && (!colisionRisk(s)))
+		if ((ships.size() <= FLEET_SIZE) && (s.isInsideBoard()) && (!collisionRisk(s)))
 		{
 			ships.add(s);
 			result = true;
@@ -187,21 +186,16 @@ public class Fleet implements IFleet
     }
 
 	/**
-	 * Colision risk boolean.
+	 * Collision risk boolean.
 	 *
 	 * @param s the s
 	 * @return the boolean
 	 */
-	private boolean colisionRisk(IShip s)
+	private boolean collisionRisk(IShip s)
     {
 		assert s != null;
 
-		for (int i = 0; i < ships.size(); i++)
-		{
-			if (ships.get(i).tooCloseTo(s))
-				return true;
-		}
-		return false;
+		return ships.stream().anyMatch(ship -> ship.tooCloseTo(s));
     }
 
 	/**

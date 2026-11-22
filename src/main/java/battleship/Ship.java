@@ -4,9 +4,11 @@
 package battleship;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.ToIntFunction;
 
 /**
  * The type Ship.
@@ -92,12 +94,12 @@ public abstract class Ship implements IShip
 	/**
 	 * The size
 	 */
-	private Integer size;
+	private int size;
 
 	/**
 	 * The Positions occupied by the ship.
 	 */
-	protected List<IPosition> positions;
+	private List<IPosition> positions;
 
 	/**
 	 * Create ships
@@ -112,14 +114,27 @@ public abstract class Ship implements IShip
 		this.category = Objects.requireNonNull(category, "Ship's category must not be null");
 		this.bearing = Objects.requireNonNull(bearing, "Ship's bearing must not be null");
 		this.pos = Objects.requireNonNull(pos, "Ship's position must not be null");
-	
-		this.category = category;
-		this.bearing = bearing;
-		this.pos = pos;
 		this.size = size;
 
 		positions = new ArrayList<>();
     }
+
+	protected void initializeLinearPositions(Compass bearing, IPosition pos)
+	{
+		switch (bearing)
+		{
+			case NORTH:
+			case SOUTH:
+				for (int r = 0; r < getSize(); r++)
+					getPositions().add(new Position(pos.getRow() + r, pos.getColumn()));
+				break;
+			case EAST:
+			case WEST:
+				for (int c = 0; c < getSize(); c++)
+					getPositions().add(new Position(pos.getRow(), pos.getColumn() + c));
+				break;
+		}
+	}
 
 	/**
 	 * Gets category.
@@ -205,7 +220,7 @@ public abstract class Ship implements IShip
 	 *
 	 * @return the size
 	 */
-	public Integer getSize()
+	public int getSize()
 	{
 		return size;
 	}
@@ -242,11 +257,7 @@ public abstract class Ship implements IShip
     @Override
     public int getTopMostPos()
     {
-	int top = getPositions().get(0).getRow();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getRow() < top)
-		top = getPositions().get(i).getRow();
-	return top;
+	return findExtremePosition(IPosition::getRow, Comparator.naturalOrder());
     }
 
 	/**
@@ -262,11 +273,7 @@ public abstract class Ship implements IShip
     @Override
     public int getBottomMostPos()
     {
-	int bottom = getPositions().get(0).getRow();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getRow() > bottom)
-			bottom = getPositions().get(i).getRow();
-	return bottom;
+	return findExtremePosition(IPosition::getRow, Comparator.reverseOrder());
     }
 
 	/**
@@ -282,11 +289,7 @@ public abstract class Ship implements IShip
     @Override
     public int getLeftMostPos()
     {
-	int left = getPositions().get(0).getColumn();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getColumn() < left)
-			left = getPositions().get(i).getColumn();
-	return left;
+	return findExtremePosition(IPosition::getColumn, Comparator.naturalOrder());
     }
 
 	/**
@@ -302,12 +305,20 @@ public abstract class Ship implements IShip
     @Override
     public int getRightMostPos()
     {
-	int right = getPositions().get(0).getColumn();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getColumn() > right)
-		right = getPositions().get(i).getColumn();
-	return right;
+	return findExtremePosition(IPosition::getColumn, Comparator.reverseOrder());
     }
+
+	private int findExtremePosition(ToIntFunction<IPosition> coordinate, Comparator<Integer> comparator)
+	{
+		int extreme = coordinate.applyAsInt(getPositions().get(0));
+		for (int i = 1; i < getSize(); i++)
+		{
+			int candidate = coordinate.applyAsInt(getPositions().get(i));
+			if (comparator.compare(candidate, extreme) < 0)
+				extreme = candidate;
+		}
+		return extreme;
+	}
 
 	/**
 	 * Occupies boolean.
