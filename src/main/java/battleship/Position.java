@@ -3,6 +3,7 @@ package battleship;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 
 /**
  * Represents a position on the game board.
@@ -62,6 +63,38 @@ public class Position implements IPosition {
 	 */
 	public static Position fromClassic(char classicRow, int classicColumn) {
 		return new Position(Character.toUpperCase(classicRow) - 'A', classicColumn - 1);
+	}
+
+	public static IPosition parseClassic(Scanner in) {
+		// Verifica se ainda há tokens disponíveis
+		if (!in.hasNext()) {
+			throw new IllegalArgumentException("Nenhuma posição válida encontrada!");
+		}
+
+		String part1 = in.next(); // Primeiro token
+		String part2 = null;
+
+		if (in.hasNextInt()) {
+			part2 = in.next(); // Segundo token, se disponível
+		}
+
+		String input = (part2 != null) ? part1 + part2 : part1;
+
+		// Normalizar o input para tratar letras maiúsculas e minúsculas
+		input = input.toUpperCase();
+
+		// Verificar os dois formatos possíveis: compactos e com espaço
+		if (input.matches("[A-Z]\\d+")) {
+			char column = input.charAt(0); // Extrair a coluna
+			int row = Integer.parseInt(input.substring(1)); // Extrair a linha
+			return Position.fromClassic(column, row);
+		} else if (part2 != null && part1.matches("[A-Z]") && part2.matches("\\d+")) {
+			char column = part1.charAt(0); // Extrair a coluna
+			int row = Integer.parseInt(part2); // Extrair a linha
+			return Position.fromClassic(column, row);
+		} else {
+			throw new IllegalArgumentException("Formato inválido. Use 'A3', 'A 3' ou similar.");
+		}
 	}
 
 	/**

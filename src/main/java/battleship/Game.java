@@ -21,12 +21,9 @@ public class Game implements IGame
 	 *                    and their positions are shown according to their placement.
 	 * @param moves       the list of moves containing shots. If shot positions are shown,
 	 *                    they will be rendered based on their outcome (hit, miss, etc.).
-	 * @param show_shots  if true, displays the shots taken during the game and marks
-	 *                    their result (hit or miss) on the board.
-	 * @param showLegend  if true, displays an explanatory legend of the symbols used
-	 *                    to represent various elements such as ships, misses, hits, etc.
+	 * @param boardView options controlling shot and legend display
 	 */
-	public static void printBoard(IFleet fleet, List<IMove> moves, boolean show_shots, boolean showLegend) {
+	public static void printBoard(IFleet fleet, List<IMove> moves, BoardView boardView) {
 
 		assert fleet != null;
 		assert moves != null;
@@ -39,12 +36,12 @@ public class Game implements IGame
 
 		printShips(fleet, map);
 
-		if (show_shots)
+		if (boardView.showShots())
 			printBoardShots(moves, map);
 
 		printBoardFrame(map);
 
-		if (showLegend) {
+		if (boardView.showLegend()) {
 			System.out.println("          LEGENDA");
 			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
 			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
@@ -54,11 +51,11 @@ public class Game implements IGame
 
 	private static void printShips(IFleet fleet, char[][] map) {
 		for (IShip ship : fleet.getShips()) {
-			for (IPosition ship_pos : ship.getPositions())
-				map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;
+			for (IPosition shipPos : ship.getPositions())
+				map[shipPos.getRow()][shipPos.getColumn()] = SHIP_MARKER;
 			if (!ship.stillFloating())
-				for (IPosition adjacent_pos : ship.getAdjacentPositions())
-					map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;
+				for (IPosition adjacentPos : ship.getAdjacentPositions())
+					map[adjacentPos.getRow()][adjacentPos.getColumn()] = SHIP_ADJACENT_MARKER;
 		}
 	}
 
@@ -343,7 +340,7 @@ public class Game implements IGame
 			} else {
 				// Caso o token já contenha a coluna e a linha juntas (ex.: "A3")
 				Scanner singleScanner = new Scanner(token);
-				shots.add(Tasks.readClassicPosition(singleScanner));
+				shots.add(Position.parseClassic(singleScanner));
 			}
 		}
 
@@ -432,11 +429,12 @@ public class Game implements IGame
 		else
 		{
 			ship.shoot(pos);
+			boolean sunk = !ship.stillFloating();
 			countHits++;
-			if (!ship.stillFloating()) {
+			if (sunk) {
 				countSinks++;
 			}
-			return new ShotResult(true, false, ship, !ship.stillFloating());
+			return new ShotResult(true, false, ship, sunk);
 		}
 	}
 
@@ -467,28 +465,24 @@ public class Game implements IGame
 	@Override
 	public int getRemainingShips()
 	{
-		List<IShip> floatingShips = myFleet.getFloatingShips();
-		return floatingShips.size();
+		return myFleet.getFloatingShips().size();
 	}
 
 	public boolean repeatedShot(IPosition pos)
 	{
 		assert pos != null;
 
-		for (IMove move : alienMoves)
-			if (move.getShots().contains(pos))
-				return true;
-		return false;
+		return alienMoves.stream().anyMatch(move -> move.getShots().contains(pos));
 	}
 
-	public void printMyBoard(boolean show_shots, boolean show_legend)
+	public void printMyBoard(boolean showShots, boolean showLegend)
 	{
-		Game.printBoard(this.myFleet, this.alienMoves, show_shots, show_legend);
+		Game.printBoard(this.myFleet, this.alienMoves, new BoardView(showShots, showLegend));
 	}
 
-	public void printAlienBoard(boolean show_shots, boolean show_legend)
+	public void printAlienBoard(boolean showShots, boolean showLegend)
 	{
-		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
+		Game.printBoard(this.alienFleet, this.myMoves, new BoardView(showShots, showLegend));
 	}
 
 	public void over() {
