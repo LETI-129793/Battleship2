@@ -236,6 +236,94 @@ public class ShipTest {
         assertEquals(8, ship.getAdjacentPositions().size(), "Error: The number of adjacent positions of a barge in the middle of the tray should be 8.");
         assertEquals(3, shipBorder.getAdjacentPositions().size(), "Error: The number of adjacent positions of a barge in the middle of the tray should be 8.");
     }
+    @Test
+    @DisplayName("Verificar posições adjacentes")
+    void testAdjacentPositions() {
+        Ship ship = Ship.buildShip("barca", Compass.NORTH, new Position(5, 5));
 
+        assertFalse(ship.getAdjacentPositions().isEmpty());
+
+        for (IPosition position : ship.getAdjacentPositions()) {
+            assertFalse(ship.occupies(position));
+        }
+    }
+
+    @Test
+    @DisplayName("Verificar representação textual")
+    void testToString() {
+        Ship ship = Ship.buildShip("barca", Compass.NORTH, new Position(5, 5));
+
+        assertNotNull(ship.toString());
+        assertTrue(ship.toString().contains("Barca"));
+    }
+    @Test
+    @DisplayName("Testar limites de um navio com varias posicoes")
+    void testLimitesNavioMaior() {
+        Ship navio = Ship.buildShip("fragata", Compass.NORTH, new Position(5, 5));
+
+        assertNotNull(navio);
+        assertTrue(navio.getPositions().size() > 1);
+
+        int menorLinha = navio.getPositions().get(0).getRow();
+        int maiorLinha = menorLinha;
+        int menorColuna = navio.getPositions().get(0).getColumn();
+        int maiorColuna = menorColuna;
+
+        for (IPosition pos : navio.getPositions()) {
+            menorLinha = Math.min(menorLinha, pos.getRow());
+            maiorLinha = Math.max(maiorLinha, pos.getRow());
+            menorColuna = Math.min(menorColuna, pos.getColumn());
+            maiorColuna = Math.max(maiorColuna, pos.getColumn());
+        }
+
+        assertEquals(menorLinha, navio.getTopMostPos());
+        assertEquals(maiorLinha, navio.getBottomMostPos());
+        assertEquals(menorColuna, navio.getLeftMostPos());
+        assertEquals(maiorColuna, navio.getRightMostPos());
+    }
+    @Test
+    @DisplayName("Testar navios dentro e fora do tabuleiro")
+    void testInsideBoard() {
+        Ship dentro = new Barge(Compass.NORTH, new Position(5, 5));
+        Ship fora = new Barge(Compass.NORTH, new Position(-1, 5));
+
+        assertTrue(dentro.isInsideBoard());
+        assertFalse(fora.isInsideBoard());
+    }
+    @Test
+    @DisplayName("Testar navio parcialmente atingido")
+    void testParcialmenteAtingido() {
+        Ship navio = Ship.buildShip("fragata", Compass.NORTH, new Position(5, 5));
+
+        assertNotNull(navio);
+        assertTrue(navio.getPositions().size() > 1);
+
+        navio.getPositions().get(0).shoot();
+
+        assertTrue(navio.stillFloating());
+
+        navio.sink();
+
+        assertFalse(navio.stillFloating());
+    }
+    @Test
+    @DisplayName("Testar construcao de todas as categorias")
+    void testBuildShipCategorias() {
+        String[] categorias = {
+                "barca", "caravela", "nau", "fragata", "galeao"
+        };
+
+        for (String categoria : categorias) {
+            Ship navio = Ship.buildShip(
+                    categoria, Compass.NORTH, new Position(5, 5)
+            );
+
+            assertNotNull(navio);
+        }
+
+        assertNull(Ship.buildShip(
+                "desconhecido", Compass.NORTH, new Position(5, 5)
+        ));
+    }
 
 }
